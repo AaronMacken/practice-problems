@@ -48,6 +48,7 @@ Instructions for building high-quality ReactJS applications with modern patterns
 - Design components to be testable and reusable
 - Keep components small and focused on a single concern
 - Use composition patterns (render props, children as functions)
+- reference eslintrc.js and .prettierrc for guidance on how to format things
 
 ### State Management
 
@@ -182,3 +183,56 @@ Instructions for building high-quality ReactJS applications with modern patterns
 - Provider pattern for context-based state sharing
 - Container/Presentational component separation
 - Custom hooks for reusable logic extraction
+
+# Project & Intent
+
+This repository is a small React + TypeScript front-end sandbox used for practicing front-end technical interview problems.
+
+- Project scaffold: custom webpack config, Babel, TypeScript, and SCSS for styling.
+- Intention: provide small, prebuilt components and problems you can open, extend, and test locally.
+
+# How the project is created
+
+- Entry: `src/index.tsx`
+- Styles: `src/index.scss` (now integrated with Tailwind via PostCSS)
+- Bundling: Webpack (configs in `webpack/`)
+- Type checking: TypeScript with `fork-ts-checker-webpack-plugin`
+- Testing: Jest + React Testing Library
+
+# Tailwind integration
+
+- Tailwind is configured with `postcss.config.js` and `tailwind.config.js`.
+- Global Tailwind directives are added to `src/index.scss`.
+- `webpack/webpack.config.common.js` was updated to run `postcss-loader` and limit CSS Modules to files matching `*.module.*`.
+
+# Practice Problems
+
+When I say to you "time to practice"
+
+Add new problem by adding component boiler plate inside of src/components/Sandbox
+Each problem should include:
+- a component with a minimal failing/unfinished implementation,
+- unit tests in Sandbox.spec.tsx
+- a problem statement writtin in comments within the sandbox.tsx file
+- example problems should be cleanly styled with dark theme and centered in the page
+- after the project is complete, I'll say to you "time to clean up" at which point you'll clear out anything you added into the sandbox component (jsx, tests, styles)
+
+# Running the project
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Start development server:
+
+```bash
+npm start
+```
+
+3. Run tests:
+
+```bash
+npm test
+```
