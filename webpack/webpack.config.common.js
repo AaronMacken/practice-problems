@@ -38,10 +38,14 @@ module.exports = {
             options: {
               esModule: true,
               modules: {
+                auto: /\.module\.(css|s[ac]ss)$/i,
                 localIdentName: '[name]-[local]--[hash:base64:5]'
               },
               sourceMap: true
             }
+          },
+          {
+            loader: 'postcss-loader'
           },
           {
             loader: 'sass-loader',

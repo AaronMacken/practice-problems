@@ -27,7 +27,8 @@
     "noUnusedParameters": false,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "types": ["jest", "@testing-library/jest-dom"]
   },
   "include": ["src/**/*"]
 }
