@@ -1,13 +1,7 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: ['jest'],
-  extends: [
-    'airbnb',
-    'airbnb/hooks',
-    'airbnb-typescript',
-    'plugin:prettier/recommended',
-    'plugin:jest/recommended'
-  ],
+  extends: ['airbnb', 'airbnb/hooks', 'airbnb-typescript', 'plugin:prettier/recommended', 'plugin:jest/recommended'],
   parserOptions: {
     project: './tsconfig.json'
   },
@@ -29,7 +23,8 @@ module.exports = {
     'for-direction': 'off',
     'no-plusplus': 'off',
     'lines-between-class-members': 'off',
-    '@typescript-eslint/lines-between-class-members': 'off'
+    '@typescript-eslint/lines-between-class-members': 'off',
+    'max-len': ['warn', { code: 120 }]
   },
   overrides: [
     {

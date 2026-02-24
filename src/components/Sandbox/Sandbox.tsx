@@ -1,38 +1,70 @@
-// import { useTheme } from '@context';
-// import { getIsDark } from '@utils';
-import { useState, useEffect, useRef, useCallback } from 'react';
-// import * as styles from './Sandbox.module.scss';
+import { useState, useCallback } from 'react';
 
-function Counter() {
-  const [count, setCount] = useState(0);
-  const ref = useRef(count);
+import { FileExplorerData } from '@constants';
 
-  // Callback changes on every render
-  const handleClick = useCallback(() => {
-    setCount((c) => c + 1);
-  }, []);
+type EntryType = 'folder' | 'file' | string;
 
-  useEffect(() => {
-    ref.current = count;
-  }, [count]);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      console.log(`Count is: ${ref.current}`);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  return (
-    <button type="button" onClick={handleClick}>
-      {count}
-    </button>
-  );
-}
-
-const Sandbox = () => {
-  return <Counter />;
+type FileAndDirectoryFields = {
+  id: string;
+  name: string;
+  type: EntryType;
 };
 
-export default Sandbox;
+type FileType = FileAndDirectoryFields & {
+  size: number;
+  modifiedAt: string;
+};
+
+interface DirectoryType extends FileAndDirectoryFields {
+  children: Array<FileType | DirectoryType>;
+}
+
+type NodeListType = {
+  nodes: Array<FileType | DirectoryType>;
+};
+
+const getIsDirectory = (node: FileType | DirectoryType): node is DirectoryType => node.type === 'folder';
+
+const Directory = ({ directory }: { directory: DirectoryType }) => {
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+
+  const handleClick = useCallback(() => {
+    setIsExpanded((prev) => !prev);
+  }, []);
+
+  const expandCollapseIcon = isExpanded ? 'v' : '>';
+
+  return (
+    <>
+      <button className="text-white" type="button" onClick={handleClick}>
+        {`${expandCollapseIcon} ${directory.name}`}
+      </button>
+      {isExpanded && <NodeList nodes={directory.children} />}
+    </>
+  );
+};
+
+// Next up, how to introduce expand / collapse state
+const NodeList = ({ nodes }: NodeListType) => {
+  return nodes.map((fileOrDirectory) => {
+    if (getIsDirectory(fileOrDirectory)) {
+      return <Directory key={fileOrDirectory.id} directory={fileOrDirectory} />;
+    }
+
+    return (
+      <p key={fileOrDirectory.id} className="text-white">
+        {fileOrDirectory.name}
+      </p>
+    );
+  });
+};
+
+export default function Sandbox() {
+  return (
+    <div className="bg-gray-900 min-h-screen flex flex-col items-center justify-center">
+      <p className="font-mono text-white text-2xl">practice problems</p>
+
+      <NodeList nodes={FileExplorerData} />
+    </div>
+  );
+}
