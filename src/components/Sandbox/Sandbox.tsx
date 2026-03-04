@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 
 import { FileExplorerData } from '@constants';
 
-type EntryType = 'folder' | 'file' | string;
+type EntryType = 'folder' | 'file';
 
 type FileAndDirectoryFields = {
   id: string;
@@ -39,7 +39,10 @@ const Directory = ({ directory }: { directory: DirectoryType }) => {
       <button className="text-white" type="button" onClick={handleClick}>
         {`${expandCollapseIcon} ${directory.name}`}
       </button>
-      {isExpanded && <NodeList nodes={directory.children} />}
+      {isExpanded && (
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        <NodeList nodes={directory.children} />
+      )}
     </>
   );
 };
