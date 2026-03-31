@@ -1,54 +1,90 @@
-import FileExplorerData from '@constants';
+import { useState, useMemo } from 'react';
 
-// 1. Create a shell of your component
-// 2. Create some types for your file data (create data if needed)
-// 3. Create the main map method inside of your primary component
-// 3. This should map over the fileExplorerData coming in through props
-// 4. Create an `isDirectory` getter use it in an `if` in your map - check for presence of `children` or something,
-// 4. a type predicate as the return value of this method can be useful!
-// 4. Create a directory component, it should accept a directory prop and will recursively call the `primary component`
+// Challenge variant, recursively sort the file explorer data w/o rendering recursion
+// Submodule thing for my application template
 
-type EntryType = 'folder' | 'file';
+import { FileExplorerData, type FileEntryType, type FolderEntryType } from '@constants';
 
-type CommonEntryFields = {
-  id: string;
-  name: string;
-  type: EntryType;
-};
+const getIsFolderEntryType = (entry: FileEntryType | FolderEntryType): entry is FolderEntryType =>
+  entry.type === 'folder';
 
-type FileType = CommonEntryFields & {
-  size: number;
-  modifiedAt: string;
-};
+const getSelectedNodeClassName = (selectedNodeId: string | null, nodeId: string) =>
+  selectedNodeId === nodeId ? 'italic underline' : '';
 
-type DirectoryType = CommonEntryFields & {
-  children: Array<FileType | DirectoryType>;
-};
-
-type NodeListType = {
-  nodes: Array<FileType | DirectoryType>;
-};
-
-const getIsDirectory = (node: FileType | DirectoryType): node is DirectoryType => node.type === 'folder';
-
-const Directory = ({ directory }: { directory: DirectoryType }) => {
-  return (
-    <>
-      <button type="button">{`>`}</button>
-      {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
-      <FileExplorer nodes={directory.children} />
-    </>
-  );
-};
-
-const FileExplorer = ({ nodes }: NodeListType) => {
-  return nodes.map((fileOrDirectory) => {
-    if (getIsDirectory(fileOrDirectory)) {
-      return <Directory directory={fileOrDirectory} />;
+const sortEntries = (entries: Array<FileEntryType | FolderEntryType>) => {
+  return [...entries].sort((a, b) => {
+    if (a.type !== b.type) {
+      return a.type === 'folder' ? -1 : 1;
     }
 
-    return <p>file</p>;
+    return a.name.localeCompare(b.name);
   });
 };
 
-export default FileExplorer;
+type FolderComponentType = {
+  entry: FolderEntryType;
+  selectedNode: string | null;
+  onNodeSelected: (id: string) => void;
+};
+
+const FolderComponent = ({ entry, selectedNode, onNodeSelected }: FolderComponentType) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const expandCollapseIcon = isExpanded ? 'v' : '>';
+  const buttonText = `${expandCollapseIcon} ${entry.name}`;
+
+  const selectedNodeClassName = getSelectedNodeClassName(selectedNode, entry.id);
+
+  const handleExpandCollapse = () => {
+    setIsExpanded((prev) => !prev);
+    onNodeSelected(entry.id);
+  };
+
+  return (
+    <div className="ml-5 block">
+      <button className={selectedNodeClassName} type="button" onClick={handleExpandCollapse}>
+        {buttonText}
+      </button>
+
+      {isExpanded && (
+        /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
+        <FileExplorer entries={entry.children} selectedNode={selectedNode} onNodeSelected={onNodeSelected} />
+      )}
+    </div>
+  );
+};
+
+type FileExplorerComponentType = {
+  entries: Array<FileEntryType | FolderEntryType>;
+  selectedNode: string | null;
+  onNodeSelected: (id: string) => void;
+};
+const FileExplorer = ({ entries, selectedNode, onNodeSelected }: FileExplorerComponentType) => {
+  const sortedEntries = useMemo(() => sortEntries(entries), [entries]);
+
+  return sortedEntries.map((entry) => {
+    const handleNodeSelected = () => onNodeSelected(entry.id);
+    const selectedNodeClassName = getSelectedNodeClassName(selectedNode, entry.id);
+    const className = `block ml-5 ${selectedNodeClassName}`;
+
+    if (getIsFolderEntryType(entry)) {
+      return (
+        <FolderComponent key={entry.id} entry={entry} selectedNode={selectedNode} onNodeSelected={onNodeSelected} />
+      );
+    }
+
+    return (
+      <button className={className} type="button" key={entry.id} onClick={handleNodeSelected}>
+        {entry.name}
+      </button>
+    );
+  });
+};
+
+const Main = () => {
+  const [selectedNode, setSelectedNode] = useState<string | null>(null);
+
+  return <FileExplorer entries={FileExplorerData} selectedNode={selectedNode} onNodeSelected={setSelectedNode} />;
+};
+
+export default Main;

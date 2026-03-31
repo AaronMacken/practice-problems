@@ -1,3 +1,1 @@
-import FileExplorerData from './FileExplorerData.json';
-
-export { FileExplorerData };
+export * from './FileExplorerData';

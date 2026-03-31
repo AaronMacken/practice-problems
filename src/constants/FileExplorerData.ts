@@ -1,0 +1,66 @@
+export type CommonEntryFields = {
+  id: string;
+  name: string;
+  type: 'folder' | 'file';
+};
+
+export type FileEntryType = CommonEntryFields & {
+  size: number;
+  modifiedAt: string;
+};
+
+export type FolderEntryType = CommonEntryFields & {
+  children: Array<FileEntryType | FolderEntryType>;
+};
+
+export const FileExplorerData: Array<FileEntryType | FolderEntryType> = [
+  {
+    id: 'root',
+    name: 'Root',
+    type: 'folder',
+    children: [
+      {
+        id: 'file4',
+        name: 'todo.txt',
+        type: 'file',
+        size: 456,
+        modifiedAt: '2026-02-21T08:00:00Z'
+      },
+      {
+        id: 'folder2',
+        name: 'Photos',
+        type: 'folder',
+        children: [
+          {
+            id: 'file3',
+            name: 'Vacation.jpg',
+            type: 'file',
+            size: 34567,
+            modifiedAt: '2026-02-19T09:00:00Z'
+          }
+        ]
+      },
+      {
+        id: 'folder1',
+        name: 'Documents',
+        type: 'folder',
+        children: [
+          {
+            id: 'file1',
+            name: 'Resume.pdf',
+            type: 'file',
+            size: 12345,
+            modifiedAt: '2026-02-20T10:30:00Z'
+          },
+          {
+            id: 'file2',
+            name: 'CoverLetter.docx',
+            type: 'file',
+            size: 23456,
+            modifiedAt: '2026-02-20T11:00:00Z'
+          }
+        ]
+      }
+    ]
+  }
+];

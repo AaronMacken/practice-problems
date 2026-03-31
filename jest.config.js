@@ -3,9 +3,13 @@ module.exports = {
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy'
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    '^@constants$': '<rootDir>/src/constants/index',
+    '^@context$': '<rootDir>/src/context/index',
+    '^@components$': '<rootDir>/src/components',
+    '^@components/(.*)$': '<rootDir>/src/components/$1'
   },
-  collectCoverage: true,
+  collectCoverage: false,
   collectCoverageFrom: [
     'src/**/*.{js,ts,jsx,tsx}',
     '!src/**/*.d.ts',
