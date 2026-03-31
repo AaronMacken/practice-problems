@@ -1,7 +1,10 @@
-// necessary for recognizing our path alias defined in webpack.config.js
 {
+  "extends": "@aaronmacken/typescript-config-react-application-template/tsconfig.json",
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "baseUrl": "./src",
+    "rootDir": "./src",
+    "types": ["jest", "@testing-library/jest-dom"],
     "paths": {
       "@components": ["components/index"],
       "@components/*": ["components/*"],
@@ -16,20 +19,7 @@
       "@customTypes": ["customTypes/index"],
       "@customTypes/*": ["customTypes/*"]
     },
-    "outDir": "./dist/",
-    "noImplicitAny": true,
-    "module": "ESNext",
-    "target": "ESNext",
-    "jsx": "react-jsx",
-    "allowJs": true,
-    "moduleResolution": "node",
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "types": ["jest", "@testing-library/jest-dom"]
+    "outDir": "./dist/"
   },
   "include": ["src/**/*"]
 }
