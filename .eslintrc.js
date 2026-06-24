@@ -8,6 +8,12 @@ module.exports = {
   },
   overrides: [
     {
+      files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
+      parserOptions: {
+        project: './tsconfig.test.json'
+      }
+    },
+    {
       files: ['webpack.**.js', 'paths.js', 'jest.config.js', 'jest.setup.ts'],
       parserOptions: {
         project: null

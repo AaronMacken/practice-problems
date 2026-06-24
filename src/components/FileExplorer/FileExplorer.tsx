@@ -1,90 +1,134 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 
-// Challenge variant, recursively sort the file explorer data w/o rendering recursion
-// Submodule thing for my application template
+type FolderOrFileNodeType = FolderNodeType | FileNodeType;
 
-import { FileExplorerData, type FileEntryType, type FolderEntryType } from '@constants';
+type CommonEntryFields = {
+  id: string;
+  name: string;
+  type: 'folder' | 'file';
+};
 
-const getIsFolderEntryType = (entry: FileEntryType | FolderEntryType): entry is FolderEntryType =>
-  entry.type === 'folder';
+type FileNodeType = CommonEntryFields & {
+  size: number;
+  modifiedAt: string;
+};
 
-const getSelectedNodeClassName = (selectedNodeId: string | null, nodeId: string) =>
-  selectedNodeId === nodeId ? 'italic underline' : '';
+type FolderNodeType = CommonEntryFields & {
+  children: Array<FolderOrFileNodeType>;
+};
 
-const sortEntries = (entries: Array<FileEntryType | FolderEntryType>) => {
-  return [...entries].sort((a, b) => {
-    if (a.type !== b.type) {
-      return a.type === 'folder' ? -1 : 1;
-    }
+const FileExplorerData: Array<FolderOrFileNodeType> = [
+  {
+    id: 'root',
+    name: 'Root',
+    type: 'folder',
+    children: [
+      {
+        id: 'file4',
+        name: 'todo.txt',
+        type: 'file',
+        size: 456,
+        modifiedAt: '2026-02-21T08:00:00Z'
+      },
+      {
+        id: 'folder2',
+        name: 'Photos',
+        type: 'folder',
+        children: [
+          {
+            id: 'file3',
+            name: 'Vacation.jpg',
+            type: 'file',
+            size: 34567,
+            modifiedAt: '2026-02-19T09:00:00Z'
+          }
+        ]
+      },
+      {
+        id: 'folder1',
+        name: 'Documents',
+        type: 'folder',
+        children: [
+          {
+            id: 'file1',
+            name: 'Resume.pdf',
+            type: 'file',
+            size: 12345,
+            modifiedAt: '2026-02-20T10:30:00Z'
+          },
+          {
+            id: 'file2',
+            name: 'CoverLetter.docx',
+            type: 'file',
+            size: 23456,
+            modifiedAt: '2026-02-20T11:00:00Z'
+          }
+        ]
+      }
+    ]
+  }
+];
 
-    return a.name.localeCompare(b.name);
-  });
+const getIsFolderType = (node: FolderOrFileNodeType): node is FolderNodeType => node.type === 'folder';
+
+const sortFileExplorerData = (nodes: Array<FolderOrFileNodeType>): Array<FolderOrFileNodeType> => {
+  return [...nodes]
+    .map((node) => {
+      return getIsFolderType(node) ? { ...node, children: sortFileExplorerData(node.children) } : node;
+    })
+    .sort((a, b) => {
+      if (a.type !== b.type) {
+        return a.type === 'folder' ? -1 : 1;
+      }
+
+      return a.name.localeCompare(b.name);
+    });
 };
 
 type FolderComponentType = {
-  entry: FolderEntryType;
-  selectedNode: string | null;
-  onNodeSelected: (id: string) => void;
+  node: FolderNodeType;
 };
 
-const FolderComponent = ({ entry, selectedNode, onNodeSelected }: FolderComponentType) => {
+const Folder = ({ node }: FolderComponentType) => {
   const [isExpanded, setIsExpanded] = useState(false);
-
   const expandCollapseIcon = isExpanded ? 'v' : '>';
-  const buttonText = `${expandCollapseIcon} ${entry.name}`;
-
-  const selectedNodeClassName = getSelectedNodeClassName(selectedNode, entry.id);
-
-  const handleExpandCollapse = () => {
-    setIsExpanded((prev) => !prev);
-    onNodeSelected(entry.id);
-  };
+  const expandCollapseButtonText = `${expandCollapseIcon} ${node.name}`;
 
   return (
-    <div className="ml-5 block">
-      <button className={selectedNodeClassName} type="button" onClick={handleExpandCollapse}>
-        {buttonText}
+    <div className="ml-5">
+      <button type="button" onClick={() => setIsExpanded((prev) => !prev)}>
+        {expandCollapseButtonText}
       </button>
-
-      {isExpanded && (
-        /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-        <FileExplorer entries={entry.children} selectedNode={selectedNode} onNodeSelected={onNodeSelected} />
-      )}
+      {
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        isExpanded && <FileExplorer nodes={node.children} />
+      }
     </div>
   );
 };
 
 type FileExplorerComponentType = {
-  entries: Array<FileEntryType | FolderEntryType>;
-  selectedNode: string | null;
-  onNodeSelected: (id: string) => void;
+  nodes: Array<FolderOrFileNodeType>;
 };
-const FileExplorer = ({ entries, selectedNode, onNodeSelected }: FileExplorerComponentType) => {
-  const sortedEntries = useMemo(() => sortEntries(entries), [entries]);
 
-  return sortedEntries.map((entry) => {
-    const handleNodeSelected = () => onNodeSelected(entry.id);
-    const selectedNodeClassName = getSelectedNodeClassName(selectedNode, entry.id);
-    const className = `block ml-5 ${selectedNodeClassName}`;
-
-    if (getIsFolderEntryType(entry)) {
-      return (
-        <FolderComponent key={entry.id} entry={entry} selectedNode={selectedNode} onNodeSelected={onNodeSelected} />
-      );
+const FileExplorer = ({ nodes }: FileExplorerComponentType) => {
+  return nodes.map((node) => {
+    if (getIsFolderType(node)) {
+      return <Folder key={node.id} node={node} />;
     }
 
     return (
-      <button className={className} type="button" key={entry.id} onClick={handleNodeSelected}>
-        {entry.name}
+      <button type="button" key={node.id} className="block ml-5">
+        {node.name}
       </button>
     );
   });
 };
 
 const Main = () => {
-  const [selectedNode, setSelectedNode] = useState<string | null>(null);
+  const sortedFileExplorerData = sortFileExplorerData(FileExplorerData);
 
-  return <FileExplorer entries={FileExplorerData} selectedNode={selectedNode} onNodeSelected={setSelectedNode} />;
+  return <FileExplorer nodes={sortedFileExplorerData} />;
 };
 
 export default Main;
