@@ -1,23 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-type FolderOrFileNodeType = FolderNodeType | FileNodeType;
+// type FolderOrFileNodeType = FolderNodeType | FileNodeType;
 
-type CommonEntryFields = {
+// type CommonEntryFields = {
+//   id: string;
+//   name: string;
+//   type: 'folder' | 'file';
+// };
+
+// type FileNodeType = CommonEntryFields & {
+//   size: number;
+//   modifiedAt: string;
+// };
+
+// type FolderNodeType = CommonEntryFields & {
+//   children: Array<FolderOrFileNodeType>;
+// };
+
+type FileAndFolderCommonFields = {
   id: string;
   name: string;
-  type: 'folder' | 'file';
 };
 
-type FileNodeType = CommonEntryFields & {
+type File = FileAndFolderCommonFields & {
+  type: 'file';
   size: number;
   modifiedAt: string;
 };
 
-type FolderNodeType = CommonEntryFields & {
-  children: Array<FolderOrFileNodeType>;
+type Folder = FileAndFolderCommonFields & {
+  type: 'folder';
+  children: Array<Folder | File>;
 };
 
-const FileExplorerData: Array<FolderOrFileNodeType> = [
+const FileExplorerData: Array<Folder | File> = [
   {
     id: 'root',
     name: 'Root',
@@ -69,66 +85,114 @@ const FileExplorerData: Array<FolderOrFileNodeType> = [
   }
 ];
 
-const getIsFolderType = (node: FolderOrFileNodeType): node is FolderNodeType => node.type === 'folder';
+// const getIsFolderType = (node: FolderOrFileNodeType): node is FolderNodeType => node.type === 'folder';
 
-const sortFileExplorerData = (nodes: Array<FolderOrFileNodeType>): Array<FolderOrFileNodeType> => {
-  return [...nodes]
-    .map((node) => {
-      return getIsFolderType(node) ? { ...node, children: sortFileExplorerData(node.children) } : node;
-    })
-    .sort((a, b) => {
-      if (a.type !== b.type) {
-        return a.type === 'folder' ? -1 : 1;
-      }
+// const sortFileExplorerData = (nodes: Array<FolderOrFileNodeType>): Array<FolderOrFileNodeType> => {
+//   return [...nodes]
+//     .map((node) => {
+//       return getIsFolderType(node) ? { ...node, children: sortFileExplorerData(node.children) } : node;
+//     })
+//     .sort((a, b) => {
+//       if (a.type !== b.type) {
+//         return a.type === 'folder' ? -1 : 1;
+//       }
 
-      return a.name.localeCompare(b.name);
-    });
+//       return a.name.localeCompare(b.name);
+//     });
+// };
+
+// type FolderComponentType = {
+//   node: FolderNodeType;
+// };
+
+// const Folder = ({ node }: FolderComponentType) => {
+//   const [isExpanded, setIsExpanded] = useState(false);
+//   const expandCollapseIcon = isExpanded ? 'v' : '>';
+//   const expandCollapseButtonText = `${expandCollapseIcon} ${node.name}`;
+
+//   return (
+//     <div className="ml-5">
+//       <button type="button" onClick={() => setIsExpanded((prev) => !prev)}>
+//         {expandCollapseButtonText}
+//       </button>
+//       {
+//         // eslint-disable-next-line @typescript-eslint/no-use-before-define
+//         isExpanded && <FileExplorer nodes={node.children} />
+//       }
+//     </div>
+//   );
+// };
+
+// type FileExplorerComponentType = {
+//   fileData: Array<FolderOrFileNodeType>;
+// };
+
+// const FileExplorer = ({ fileData }: FileExplorerComponentType) => {
+//   return nodes.map((node) => {
+//     if (getIsFolderType(node)) {
+//       return <Folder key={node.id} node={node} />;
+//     }
+
+//     return (
+//       <button type="button" key={node.id} className="block ml-5">
+//         {node.name}
+//       </button>
+//     );
+//   });
+// };
+
+// expanding a folders contents
+
+const getIsFolder = (node: Folder | File): node is Folder => node.type === 'folder';
+
+type ExpandedNodes = Record<string, boolean>;
+
+const getIsFolderExpaned = (nodeId: string, expandedNodes: ExpandedNodes) => Boolean(expandedNodes[nodeId]);
+
+type MainProps = {
+  nodes?: Array<File | Folder>;
 };
 
-type FolderComponentType = {
-  node: FolderNodeType;
-};
+const Main = ({ nodes = FileExplorerData }: MainProps) => {
+  const [expandedNodes, setExpandedNodes] = useState<ExpandedNodes>({});
 
-const Folder = ({ node }: FolderComponentType) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const expandCollapseIcon = isExpanded ? 'v' : '>';
-  const expandCollapseButtonText = `${expandCollapseIcon} ${node.name}`;
+  useEffect(() => {
+    console.log('expanded nodes has updated! ', expandedNodes);
+  }, [expandedNodes]);
 
-  return (
-    <div className="ml-5">
-      <button type="button" onClick={() => setIsExpanded((prev) => !prev)}>
-        {expandCollapseButtonText}
-      </button>
-      {
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        isExpanded && <FileExplorer nodes={node.children} />
-      }
-    </div>
-  );
-};
+  // ExpandedFolders { 1: true, 2: false }
+  // get is folder expanded
+  // expanded folders.includes(idOfExpandedFolder)
 
-type FileExplorerComponentType = {
-  nodes: Array<FolderOrFileNodeType>;
-};
+  // render contents
 
-const FileExplorer = ({ nodes }: FileExplorerComponentType) => {
+  // need to recursively render itself, can I have some conditional logic
+  // to rener the main data set if it was provided or just render a prop?
+
+  const handleExpanded = (id: string) => {
+    console.log('clicked: ', id);
+
+    setExpandedNodes((prevState) => ({ ...prevState, [id]: !prevState[id] }));
+  };
+
   return nodes.map((node) => {
-    if (getIsFolderType(node)) {
-      return <Folder key={node.id} node={node} />;
+    const { id, name } = node;
+
+    if (getIsFolder(node)) {
+      const isFolderExpanded = getIsFolderExpaned(id, expandedNodes);
+
+      return (
+        <>
+          <button id={id} type="button" onClick={() => handleExpanded(id)}>
+            Fo {name}
+          </button>
+          {isFolderExpanded && <Main nodes={node.children} />}
+        </>
+      );
     }
 
-    return (
-      <button type="button" key={node.id} className="block ml-5">
-        {node.name}
-      </button>
-    );
+    return <p id={id}>Fi {name}</p>;
   });
-};
-
-const Main = () => {
-  const sortedFileExplorerData = sortFileExplorerData(FileExplorerData);
-
-  return <FileExplorer nodes={sortedFileExplorerData} />;
 };
 
 export default Main;

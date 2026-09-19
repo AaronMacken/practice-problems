@@ -11,45 +11,18 @@
 - Keep selected node state in the parent and pass it down via props.
 - Clicking a folder both selects it and toggles its expanded state.
 
-Use the base problem, then add one variation each session.
+## How to Solve
 
-## Easy
+- DEFINE INPUT: The list of files will be your data source
 
-- Default-open root folders only.
-- Persist expanded/collapsed state after re-render.
-- Show file/folder counts next to folder names.
-- Add "expand all" and "collapse all" actions.
-- Preserve alphabetical sort, but make it case-insensitive.
-- Keep folders first, but allow toggling sort direction A-Z/Z-A.
-- Highlight full path of selected node (breadcrumb at top).
+  - if working with typescript, it will be important to create a type for this
+  - the type is a worth while time investment that will help you solve the problem in dev
+  - look at each field and create a type, keep a tally of the common fields, separate
+  - give your data that type, this will be helpful later incase TS tries to infer values
 
-## Medium
-
-- Add single-select keyboard navigation with up/down arrows.
-- Add left/right arrows to collapse/expand folders.
-- Support Enter to select and Space to toggle folder.
-- Add search filter by name while preserving tree structure.
-- Search mode auto-expands matching folder paths.
-- Support multi-select with Ctrl/Cmd-click.
-- Add tri-state folder selection (none/partial/all selected children).
-- Prevent duplicate names within same folder.
-
-## Hard
-
-- Lazy-load children for specific folders on first expand (mock async).
-- Show loading and error states for async child loading.
-- Add context menu actions: rename, delete, create file/folder.
-- Implement inline rename with validation and cancel/confirm behavior.
-- Allow drag-and-drop reparenting (move file/folder).
-- Disallow moving a folder into its own descendant.
-- Add undo/redo for rename/move/delete.
-- Keep expansion and selection state synced to URL query params.
-- Add access rules: some nodes read-only, some hidden, some disabled.
-- Virtualize rendering for very large trees.
-
-## Session Rotation Template
-
-1. Solve base tree behavior (render, select, expand/collapse).
-2. Add one state variation (persist, undo/redo, URL sync).
-3. Add one UX variation (keyboard, search, breadcrumb).
-4. Add one data variation (lazy load, permissions, large tree).
+- ENTRY POINT: Map over the data and create separate paths for files vs folders
+  - first you'll need a simple predicate which can determine what path you'll land on
+  - create the scaffolding and then move onto the predicate
+  - bonus points for using a `type predicate` which will make your development easier
+  - start fleshing out some of the values you'll pass into the jsx
+  - dont forget the ID if you're mapping (be prepared to go into trivia mode)
