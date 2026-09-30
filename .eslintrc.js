@@ -6,6 +6,9 @@ module.exports = {
   parserOptions: {
     project: './tsconfig.json'
   },
+  rules: {
+    '@typescript-eslint/no-unused-expressions': ['error', { allowShortCircuit: true }]
+  },
   overrides: [
     {
       files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],

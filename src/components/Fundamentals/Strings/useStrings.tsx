@@ -41,9 +41,6 @@ function stringBasics() {
   // abc followed by space followed by @
   console.log(`abc @ - ${/abc\s@/.test('abc @')}`);
 
-  // is proper email format - not perfect but good try
-  console.log(`is proper email format: ${/[a-z0-9]@[a-z].[a-z]/i.test('test@gmail.com')}`);
-
   // anything except abc
   console.log(`anything except abc ${/^[abc]/.test('xyz')}`);
 
@@ -72,9 +69,58 @@ function stringBasics() {
   });
 }
 
+// -- BASIC STRING PROBLEM SOLVING TECHNIQUES -- //
+// 1. String Traversal
+// 2. Character Counting
+// 3. Building Strings
+// 4. Normalization
+// 5. Substrings
+
+const stripNonAlphaNumericCharacters = (initialString: string): string => {
+  const characters: Array<string> = [];
+
+  initialString.split('').forEach((character: string) => {
+    const isAlphaNumeric = /[a-z0-9]/i.test(character);
+
+    isAlphaNumeric && characters.push(character.toLowerCase());
+  });
+
+  const normalizedString = characters.join('');
+
+  return normalizedString;
+};
+
+// ignore capitalization and non-alphanumeric characters
+// "can I make the input easier to compare first?"
+// normalize -> compare
+// comparing opposize ends often suggests two pointers
+const getIsValidPalindrome = (initialString: string): Boolean => {
+  const normalizedString = stripNonAlphaNumericCharacters(initialString);
+
+  let left = 0;
+  let right = normalizedString.length - 1;
+  let isPalindrome = true;
+
+  while (left < right) {
+    console.log('looping');
+    if (normalizedString[left] !== normalizedString[right]) {
+      isPalindrome = false;
+      break;
+    }
+
+    left++;
+    right--;
+  }
+
+  return isPalindrome;
+};
+
 const useStrings = () => {
   useEffect(() => {
-    stringBasics();
+    const input = 'A man, a plan, a canal: Panama';
+    const isValidPalindrome = getIsValidPalindrome(input);
+
+    console.log(`isValidPalindrome: ${isValidPalindrome}`);
   }, []);
 };
 
