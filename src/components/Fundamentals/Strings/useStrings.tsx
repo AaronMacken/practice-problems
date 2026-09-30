@@ -115,12 +115,43 @@ const getIsValidPalindrome = (initialString: string): Boolean => {
   return isPalindrome;
 };
 
+// TODO: Identify edge cases
+const getLongestCommonPrefix = (strings: Array<string>): string => {
+  if (!strings.length) {
+    return '';
+  }
+
+  const initialComparison = strings[0];
+  const commonPrefixValues = new Set<string>();
+  let haveStringsDiverged = false;
+
+  // f l o w e r
+  // for each index in first string
+  for (let i = 0; i < initialComparison.split('').length; i++) {
+    if (haveStringsDiverged) {
+      break;
+    }
+
+    for (let j = 1; j < strings.length; j++) {
+      if (initialComparison[i] !== strings[j][i]) {
+        haveStringsDiverged = true;
+
+        break;
+      }
+
+      commonPrefixValues.add(initialComparison[i]);
+    }
+  }
+
+  console.log('longest prefix: ', Array.from(commonPrefixValues).join(''));
+};
+
 const useStrings = () => {
   useEffect(() => {
-    const input = 'A man, a plan, a canal: Panama';
-    const isValidPalindrome = getIsValidPalindrome(input);
+    // const input = 'A man, a plan, a canal: Panama';
+    // const isValidPalindrome = getIsValidPalindrome(input);
 
-    console.log(`isValidPalindrome: ${isValidPalindrome}`);
+    getLongestCommonPrefix(['flower', 'flow', 'flight']);
   }, []);
 };
 
