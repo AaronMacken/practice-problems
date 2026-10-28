@@ -133,13 +133,115 @@ const getLongestCommonPrefix = (strings: Array<string>): string => {
   return firstString;
 };
 
+const getFirstUniqueCharacter = (initialString: string) => {
+  // create a frequency map
+  // loop through the entire string
+  // create an array from the map and filter by the occurences
+  // take the first or return nothing
+
+  if (!initialString) {
+    return null;
+  }
+
+  const frequencyMap = new Map<string, number>();
+
+  initialString.split('').forEach((character) => {
+    frequencyMap.set(character, (frequencyMap.get(character) ?? 0) + 1);
+  });
+
+  const entries = Array.from(frequencyMap);
+
+  for (let i = 0; i < entries.length; i++) {
+    const [character, occurences] = entries[i];
+
+    if (occurences === 1) {
+      return character;
+    }
+  }
+
+  return null;
+};
+
+// Anagram meaning all characters in string A also exist in string B - even if they aren't in the same order
+// 1. create a frequency map from all characters in string A
+// 2. loop through string B and subtract the value from the frequency map when you see a match
+// if value doesnt exist in the frequency map thats an automatic false
+// if string lengths dont match thats an automatic false
+const getIsValidAnagram = (initialString: string, comparisonString: string) => {
+  if (initialString.length !== comparisonString.length) {
+    return false;
+  }
+
+  let isAnagram;
+  const frequencyMap = new Map<string, number>();
+
+  initialString.split('').forEach((character) => {
+    frequencyMap.set(character, (frequencyMap.get(character) ?? 0) + 1);
+  });
+
+  comparisonString.split('').forEach((character) => {
+    if (!frequencyMap.get(character)) {
+      isAnagram = false;
+
+      return;
+    }
+
+    frequencyMap.set(character, frequencyMap.get(character) - 1);
+  });
+
+  if (isAnagram === false) {
+    return isAnagram;
+  }
+
+  const remainingUnamtchedCharacters = Array.from(frequencyMap).reduce((acc, [, occurences]) => {
+    return acc + occurences;
+  }, 0);
+
+  console.log('remaining unmatched characters: ', remainingUnamtchedCharacters);
+
+  return remainingUnamtchedCharacters === 0;
+};
+
+// input "aaabbccccd"
+// output "a3b2c4d"
+
+// frequency map here is possible unless we want to retain the order
+
+// ex aaabbcaaccc -> a3b2ca2c3
+const getCompressedString = (initialString: string) => {
+  if (!initialString) {
+    return '';
+  }
+
+  // loop through the string, compare current index with currentIndex + 1;
+  // if it matches, increment count
+  // otherwise, add that character / occ to an array
+
+  const compressedStringValues: Array<string> = [];
+  // count starts at one because the first time we see something its obviously the first time we saw it
+  let count = 1;
+
+  for (let i = 0; i < initialString.length; i++) {
+    if (initialString[i] === initialString[i + 1]) {
+      count++;
+    } else {
+      compressedStringValues.push(`${initialString[i]}${count > 1 ? count : ''}`);
+      count = 0;
+    }
+  }
+
+  return compressedStringValues.join('');
+};
+
 const useStrings = () => {
   useEffect(() => {
     // const input = 'A man, a plan, a canal: Panama';
     // const isValidPalindrome = getIsValidPalindrome(input);
-
-    console.log(getLongestCommonPrefix(['flower', 'flow', 'flight']));
-    console.log(getLongestCommonPrefix(['flow', 'flow', 'flower']));
+    // console.log(getLongestCommonPrefix(['flower', 'flow', 'flight']));
+    // console.log(getLongestCommonPrefix(['floooow', 'floooower', 'flooooower']));
+    // console.log('first unique character', getFirstUniqueCharacter('leetcode'));
+    // console.log('get is valid anagram: ', getIsValidAnagram('aab', 'baa'));
+    // console.log('getCompressedString: ', getCompressedString('aaabbccccd'));
   }, []);
 };
 
